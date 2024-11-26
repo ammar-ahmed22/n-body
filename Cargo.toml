@@ -1,0 +1,15 @@
+[package]
+name = "n-body"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.93"
+bevy = "0.13.0"
+log = "0.4.22"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
