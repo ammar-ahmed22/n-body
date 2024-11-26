@@ -1,7 +1,6 @@
-use bevy::prelude::*;
-use bevy::sprite::{ MaterialMesh2dBundle, Mesh2dHandle };
 use crate::particle::Particle;
-
+use bevy::prelude::*;
+use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 
 #[derive(Bundle)]
 pub struct ParticleBundle {
@@ -23,7 +22,7 @@ impl ParticleBundle {
                 transform: Transform::from_translation(particle.position().extend(0.0)),
                 ..default()
             },
-            particle
+            particle,
         }
     }
 }
