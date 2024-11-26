@@ -1,6 +1,8 @@
 use crate::error::handle_error;
 use crate::particle::Particle;
 use crate::resources::constants;
+use crate::resources::input;
+use crate::utils;
 use bevy::prelude::*;
 
 // Constants
@@ -38,6 +40,39 @@ pub fn spawn_initial(
     commands.spawn(small2.bundle(Color::WHITE, &mut meshes, &mut materials));
     commands.spawn(big.bundle(Color::WHITE, &mut meshes, &mut materials));
     commands.spawn(small1.bundle(Color::WHITE, &mut meshes, &mut materials));
+}
+
+pub fn spawn_input(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut mouse_state: ResMut<input::MouseState>,
+    lines: Query<(Entity, &utils::Line)>
+) {
+    if let Some(released) = mouse_state.release {
+        if let Some(clicked) = mouse_state.click {
+            let mut p = Particle::default();
+            handle_error(p.set_radius(SMALL_RAD));
+            handle_error(p.set_density(SMALL_DENSITY));
+            p.set_pos(clicked);
+            let vel = clicked - released;
+            p.set_vel(vel);
+            commands.spawn(p.bundle(Color::WHITE, &mut meshes, &mut materials));   
+            *mouse_state = input::MouseState::default();
+        }
+    }
+    // Despawn any old lines (should only be 1)
+    for (entity, _) in lines.iter() {
+        commands.entity(entity).despawn();
+    }
+
+    if let Some(drag) = mouse_state.dragging {
+        if let None = mouse_state.release {
+            if let Some(clicked) = mouse_state.click {
+                utils::line(&mut commands, clicked, drag, 1.0, Color::WHITE);
+            }
+        }
+    }
 }
 
 pub fn update(
