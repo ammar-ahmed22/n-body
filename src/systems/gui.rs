@@ -20,7 +20,7 @@ fn stats_section(
         .striped(true)
         .show(ui, |ui| {
             let labels = vec![
-                ("Particles:", format!("{}", particles)),
+                ("# of Particles:", format!("{}", particles)),
                 ("FPS:", format!("{:.1}", fps)),
             ];
             for (label, value) in labels {
