@@ -1,3 +1,4 @@
+pub mod gui;
 pub mod particles;
 use bevy::prelude::*;
 

@@ -1,10 +1,11 @@
 use crate::error::handle_error;
 use crate::particle::Particle;
+use crate::resources::constants;
 use bevy::prelude::*;
 
 // Constants
-const G: f32 = 66.7;
-const RESTITUTION: f32 = 0.8;
+// const G: f32 = 66.7;
+// const RESTITUTION: f32 = 0.8;
 
 // Sizes
 const BIG_DENSITY: f32 = 0.01;
@@ -39,15 +40,19 @@ pub fn spawn(
     commands.spawn(small1.bundle(Color::WHITE, &mut meshes, &mut materials));
 }
 
-pub fn update(mut query: Query<(Entity, &mut Particle)>, time: Res<Time>) {
+pub fn update(
+    mut query: Query<(Entity, &mut Particle)>,
+    time: Res<Time>,
+    constants: Res<constants::NumericConstants>,
+) {
     let particles: Vec<(Entity, Particle)> = query.iter().map(|(e, p)| (e, p.clone())).collect();
     for (entity_a, mut a) in query.iter_mut() {
         for (entity_b, b) in &particles {
             if entity_a == *entity_b {
                 continue;
             }
-            a.handle_collision(b, RESTITUTION);
-            a.handle_attraction(b, G);
+            a.handle_collision(b, constants.restitution.value);
+            a.handle_attraction(b, constants.g.value);
         }
         a.update(time.delta_seconds());
     }

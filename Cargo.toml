@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.93"
 bevy = "0.13.0"
+bevy_egui = "0.27"
 log = "0.4.22"
 
 [profile.dev]
