@@ -14,7 +14,7 @@ const BIG_RAD: f32 = 100.0;
 const SMALL_DENSITY: f32 = 0.0001;
 const SMALL_RAD: f32 = 10.0;
 
-pub fn spawn(
+pub fn spawn_initial(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,

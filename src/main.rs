@@ -10,8 +10,11 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(EguiPlugin)
         .add_plugins(FrameTimeDiagnosticsPlugin)
-        .add_systems(Startup, (systems::setup, systems::particles::spawn).chain())
-        .add_systems(Update, (systems::gui::stats, systems::gui::parameters))
+        .add_systems(
+            Startup,
+            (systems::setup, systems::particles::spawn_initial).chain(),
+        )
+        .add_systems(Update, systems::gui::gui)
         .add_systems(
             Update,
             (systems::particles::update, systems::particles::render).chain(),
