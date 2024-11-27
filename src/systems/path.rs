@@ -1,12 +1,16 @@
 use bevy::prelude::*;
 use crate::particle;
 use crate::utils;
+use crate::resources;
 
 pub fn update(
   mut query: Query<(&mut particle::path::Path, &particle::Particle)>,
+  state: Res<resources::SimulationState>
 ) {
-  for (mut trail, particle) in query.iter_mut() {
-    trail.add_point(particle.position());
+  if state.controls.show_path {
+    for (mut trail, particle) in query.iter_mut() {
+      trail.add_point(particle.position());
+    }
   }
 }
 
@@ -16,21 +20,24 @@ pub struct ParticlePath;
 pub fn render(
   mut commands: Commands,
   query: Query<&particle::path::Path>,
-  particle_paths: Query<Entity, With<ParticlePath>>
+  particle_paths: Query<Entity, With<ParticlePath>>,
+  state: Res<resources::SimulationState>
 ) {
 
   for entity in particle_paths.iter() {
     commands.entity(entity).despawn();
   }
 
-  for path in query.iter() {
-    if path.size() < 2 {
-      continue;
+  if state.controls.show_path {
+    for path in query.iter() {
+      if path.size() < 2 {
+        continue;
+      }
+  
+      commands.spawn((
+        utils::LineBundle::path(&path.points, Color::rgba(1.0, 1.0, 1.0, 0.5), 1.0),
+        ParticlePath
+      ));
     }
-
-    commands.spawn((
-      utils::LineBundle::path(&path.points, Color::WHITE, 1.0),
-      ParticlePath
-    ));
   }
 }

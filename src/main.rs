@@ -2,13 +2,13 @@ use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 use bevy_egui::EguiPlugin;
-use n_body::resources::constants;
 use n_body::resources::input;
+use n_body::resources;
 use n_body::systems;
 
 fn main() {
     App::new()
-        .insert_resource(constants::NumericConstants::new())
+        .insert_resource(resources::SimulationState::new())
         .insert_resource(input::MouseState::default())
         .add_plugins(DefaultPlugins)
         .add_plugins(EguiPlugin)

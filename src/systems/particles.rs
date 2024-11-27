@@ -1,7 +1,7 @@
 use crate::error::handle_error;
 use crate::particle::Particle;
-use crate::resources::constants;
 use crate::resources::input;
+use crate::resources;
 use crate::utils;
 use bevy::prelude::*;
 
@@ -80,7 +80,7 @@ pub fn spawn_input(
 pub fn update(
     mut query: Query<(Entity, &mut Particle)>,
     time: Res<Time>,
-    constants: Res<constants::NumericConstants>,
+    state: Res<resources::SimulationState>,
 ) {
     let particles: Vec<(Entity, Particle)> = query.iter().map(|(e, p)| (e, p.clone())).collect();
     for (entity_a, mut a) in query.iter_mut() {
@@ -88,8 +88,8 @@ pub fn update(
             if entity_a == *entity_b {
                 continue;
             }
-            a.handle_collision(b, constants.restitution.value);
-            a.handle_attraction(b, constants.g.value);
+            a.handle_collision(b, state.numeric_constants.restitution.value);
+            a.handle_attraction(b, state.numeric_constants.g.value);
         }
         a.update(time.delta_seconds());
     }

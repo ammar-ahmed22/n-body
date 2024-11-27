@@ -27,7 +27,7 @@ impl ParticleBundle {
                 ..default()
             },
             particle,
-            path: Path::new(100),
+            path: Path::new(200),
             fill: Fill::color(color),
             stroke: if let Some(stroke) = stroke { stroke } else { Stroke::new(Color::WHITE, 1.0) }
         }

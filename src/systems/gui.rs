@@ -1,5 +1,6 @@
 use crate::particle::Particle;
 use crate::resources::constants;
+use crate::resources;
 use bevy::diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
@@ -31,7 +32,7 @@ fn stats_section(
         });
 }
 
-fn params_section(ui: &mut egui::Ui, numeric_constants: &mut ResMut<constants::NumericConstants>) {
+fn params_section(ui: &mut egui::Ui, numeric_constants: &mut constants::NumericConstants) {
     egui::Grid::new("params_grid")
         .num_columns(2)
         .spacing([40.0, 4.0])
@@ -49,9 +50,21 @@ fn params_section(ui: &mut egui::Ui, numeric_constants: &mut ResMut<constants::N
         });
 }
 
+fn controls_section(ui: &mut egui::Ui, controls: &mut resources::controls::Controls) {
+    egui::Grid::new("control_grid")
+        .num_columns(2)
+        .spacing([40.0, 4.0])
+        .striped(true)
+        .show(ui, |ui| {
+            ui.label("Show path?");
+            ui.checkbox(&mut controls.show_path, "");
+            ui.end_row();
+        });
+}
+
 pub fn gui(
     mut contexts: EguiContexts,
-    mut numeric_constants: ResMut<constants::NumericConstants>,
+    mut state: ResMut<resources::SimulationState>,
     particles_query: Query<&Particle>,
     diagnostics: Res<DiagnosticsStore>,
 ) {
@@ -63,6 +76,9 @@ pub fn gui(
             stats_section(ui, &particles_query, &diagnostics);
             ui.separator();
             ui.heading("Parameters");
-            params_section(ui, &mut numeric_constants);
+            params_section(ui, &mut state.numeric_constants);
+            ui.separator();
+            ui.heading("Controls");
+            controls_section(ui, &mut state.controls);
         });
 }

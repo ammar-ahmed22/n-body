@@ -1,4 +1,3 @@
-use bevy::prelude::*;
 use std::ops::RangeInclusive;
 
 pub struct NumericConstant {
@@ -19,7 +18,6 @@ impl NumericConstant {
     }
 }
 
-#[derive(Resource)]
 pub struct NumericConstants {
     pub g: NumericConstant,
     pub restitution: NumericConstant,
