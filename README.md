@@ -10,13 +10,13 @@
 - **Performance Metrics:** Displays real-time statistics like FPS and body count to monitor simulation efficiency
 
 ## Usage
-1. Clone the repository  
+1. **Clone the repository**  
 ```bash
 git clone https://github.com/ammar-ahmed22/n-body
 cd n-body
 ```
 
-2. Build and run the project  
+2. **Build and run the project**  
 ```bash
 cargo run --release
 ```
