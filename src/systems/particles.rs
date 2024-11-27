@@ -4,6 +4,7 @@ use crate::resources::input;
 use crate::resources;
 use crate::utils;
 use bevy::prelude::*;
+use bevy_prototype_lyon::prelude::*;
 
 // Constants
 // const G: f32 = 66.7;
@@ -95,9 +96,15 @@ pub fn update(
     }
 }
 
-pub fn render(mut query: Query<(&mut Transform, &Particle)>) {
-    for (mut transform, particle) in query.iter_mut() {
+pub fn render(
+    mut query: Query<(&mut Transform, &Particle, &mut Fill, &mut Stroke)>,
+    state: Res<resources::SimulationState>,
+) {
+
+    for (mut transform, particle, mut fill, mut stroke) in query.iter_mut() {
         let pos = particle.position();
         transform.translation = pos.extend(0.0);
+        *fill = Fill::color(state.controls.particle_color);
+        *stroke = Stroke::new(state.controls.particle_stroke, 1.0);
     }
 }

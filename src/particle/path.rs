@@ -30,22 +30,10 @@ impl Path {
     return self.max_size;
   }
 
-  pub fn to_vertices(&self) -> Vec<[f32; 3]> {
-    self.points
-      .iter()
-      .map(|&pos| [pos.x, pos.y, 0.0])
-      .collect()
-  }
-
-  pub fn to_indices(&self) -> Vec<u32> {
-    let mut indices = Vec::new();
-    for (i, _) in self.points.iter().enumerate() {
-      if i > 0 {
-        let prev = i - 1;
-        indices.push(prev as u32);
-        indices.push(i as u32);
-      }
+  pub fn reset(&mut self) {
+    if self.points.len() == 0 {
+      return;
     }
-    return indices;
+    self.points = Vec::new();
   }
 }

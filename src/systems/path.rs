@@ -8,8 +8,12 @@ pub fn update(
   state: Res<resources::SimulationState>
 ) {
   if state.controls.show_path {
-    for (mut trail, particle) in query.iter_mut() {
-      trail.add_point(particle.position());
+    for (mut path, particle) in query.iter_mut() {
+      path.add_point(particle.position());
+    }
+  } else {
+    for (mut path, _) in query.iter_mut() {
+      path.reset();
     }
   }
 }

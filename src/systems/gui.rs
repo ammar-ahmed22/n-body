@@ -50,14 +50,28 @@ fn params_section(ui: &mut egui::Ui, numeric_constants: &mut constants::NumericC
         });
 }
 
+fn color_input(ui: &mut egui::Ui, color: &mut Color) {
+    let [r, g, b, a] = color.as_rgba_u8();
+    let mut input_color = egui::Color32::from_rgba_unmultiplied(r, g, b, a);
+    ui.color_edit_button_srgba(&mut input_color);
+    let [nr, ng, nb, na] = input_color.to_array();
+    *color = Color::rgba_u8(nr, ng, nb, na);
+}
+
 fn controls_section(ui: &mut egui::Ui, controls: &mut resources::controls::Controls) {
     egui::Grid::new("control_grid")
         .num_columns(2)
         .spacing([40.0, 4.0])
         .striped(true)
         .show(ui, |ui| {
-            ui.label("Show path?");
+            ui.label("Trace Path");
             ui.checkbox(&mut controls.show_path, "");
+            ui.end_row();
+            ui.label("Particle Color");
+            color_input(ui, &mut controls.particle_color);
+            ui.end_row();
+            ui.label("Particle Stroke");
+            color_input(ui, &mut controls.particle_stroke);
             ui.end_row();
         });
 }
@@ -82,3 +96,16 @@ pub fn gui(
             controls_section(ui, &mut state.controls);
         });
 }
+
+// pub fn absorb_gui_inputs(
+//     // mut mouse: ResMut<ButtonInput<MouseButton>>,
+//     mut event_reader: EventReader<MouseButtonInput>,
+//     mut event_writer: EventWriter<MouseButtonInput>,
+//     mut contexts: EguiContexts
+// ) {
+//     if !contexts.ctx_mut().is_pointer_over_area() {
+//         for event in event_reader.read() {
+//             event_writer.send(event.clone());
+//         }
+//     }
+// }

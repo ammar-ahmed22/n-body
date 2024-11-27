@@ -18,6 +18,7 @@ fn main() {
             Startup,
             (systems::setup, systems::particles::spawn_initial).chain(),
         )
+        // .add_systems(PreUpdate, systems::gui::absorb_gui_inputs.after(bevy_egui::systems::process_input_system).before(bevy_egui::EguiSet::BeginFrame))
         .add_systems(Update, systems::gui::gui)
         .add_systems(Update, (systems::input::mouse_hold, systems::particles::spawn_input))
         .add_systems(Update, (systems::path::update, systems::path::render).chain())
