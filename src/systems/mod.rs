@@ -1,6 +1,7 @@
 pub mod gui;
 pub mod particles;
 pub mod input;
+pub mod path;
 
 use bevy::prelude::*;
 

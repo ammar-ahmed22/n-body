@@ -7,6 +7,7 @@ edition = "2021"
 anyhow = "1.0.93"
 bevy = "0.13.0"
 bevy_egui = "0.27"
+bevy_prototype_lyon = "0.11"
 log = "0.4.22"
 rand = "0.8.5"
 

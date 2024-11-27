@@ -1,8 +1,10 @@
 mod bundle;
+pub mod path;
 
 use crate::particle::bundle::ParticleBundle;
 use anyhow::Result;
 use bevy::prelude::*;
+use bevy_prototype_lyon::prelude::*;
 
 #[derive(Component, Clone)]
 pub struct Particle {
@@ -11,6 +13,8 @@ pub struct Particle {
     acc: Vec2,
     radius: f32,
     density: f32,
+    points: Vec<Vec2>,
+    max_points: usize,
 }
 
 impl Default for Particle {
@@ -21,6 +25,8 @@ impl Default for Particle {
             acc: Vec2::default(),
             density: 1.0,
             radius: 0.0,
+            points: vec![],
+            max_points: 100,
         }
     }
 }
@@ -108,10 +114,16 @@ impl Particle {
     pub fn bundle(
         &self,
         color: Color,
-        meshes: &mut ResMut<Assets<Mesh>>,
-        materials: &mut ResMut<Assets<ColorMaterial>>,
+        stroke: Option<Stroke>
     ) -> ParticleBundle {
-        return ParticleBundle::new(self.clone(), color, meshes, materials);
+        return ParticleBundle::new(self.clone(), color, stroke);
+    }
+
+    pub fn add_point(&mut self, p: Vec2) {
+        self.points.push(p);
+        if self.points.len() > self.max_points {
+            self.points.remove(0);
+        }
     }
 
     /// Updates the particles position using Semi-implicit Euler integration

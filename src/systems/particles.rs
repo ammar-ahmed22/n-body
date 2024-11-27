@@ -18,8 +18,6 @@ const SMALL_RAD: f32 = 10.0;
 
 pub fn spawn_initial(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let mut big = Particle::default();
     handle_error(big.set_radius(BIG_RAD));
@@ -37,17 +35,18 @@ pub fn spawn_initial(
     small2.set_pos(Vec2::new(250.0, 0.0));
     small2.set_vel(Vec2::new(0.0, -115.0));
 
-    commands.spawn(small2.bundle(Color::WHITE, &mut meshes, &mut materials));
-    commands.spawn(big.bundle(Color::WHITE, &mut meshes, &mut materials));
-    commands.spawn(small1.bundle(Color::WHITE, &mut meshes, &mut materials));
+    commands.spawn(small2.bundle(Color::WHITE, None));
+    commands.spawn(big.bundle(Color::WHITE, None));
+    commands.spawn(small1.bundle(Color::WHITE, None));
 }
+
+#[derive(Component)]
+pub struct SpawnIndicator;
 
 pub fn spawn_input(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
     mut mouse_state: ResMut<input::MouseState>,
-    lines: Query<(Entity, &utils::Line)>
+    spawn_indicators: Query<Entity, With<SpawnIndicator>>
 ) {
     if let Some(released) = mouse_state.release {
         if let Some(clicked) = mouse_state.click {
@@ -57,19 +56,22 @@ pub fn spawn_input(
             p.set_pos(clicked);
             let vel = clicked - released;
             p.set_vel(vel);
-            commands.spawn(p.bundle(Color::WHITE, &mut meshes, &mut materials));   
+            commands.spawn(p.bundle(Color::WHITE, None));   
             *mouse_state = input::MouseState::default();
         }
     }
     // Despawn any old lines (should only be 1)
-    for (entity, _) in lines.iter() {
+    for entity in spawn_indicators.iter() {
         commands.entity(entity).despawn();
     }
 
     if let Some(drag) = mouse_state.dragging {
         if let None = mouse_state.release {
             if let Some(clicked) = mouse_state.click {
-                utils::line(&mut commands, clicked, drag, 1.0, Color::WHITE);
+                commands.spawn((
+                    utils::LineBundle::new(clicked, drag, Color::WHITE, 1.0),
+                    SpawnIndicator
+                ));
             }
         }
     }
@@ -95,6 +97,7 @@ pub fn update(
 
 pub fn render(mut query: Query<(&mut Transform, &Particle)>) {
     for (mut transform, particle) in query.iter_mut() {
-        transform.translation = particle.position().extend(0.0);
+        let pos = particle.position();
+        transform.translation = pos.extend(0.0);
     }
 }
