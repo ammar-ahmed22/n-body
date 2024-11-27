@@ -1,6 +1,6 @@
 use crate::particle::Particle;
-use crate::resources::constants;
 use crate::resources;
+use crate::resources::constants;
 use bevy::diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};

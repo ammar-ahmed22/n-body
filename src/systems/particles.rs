@@ -1,7 +1,8 @@
 use crate::error::handle_error;
 use crate::particle::Particle;
-use crate::resources::input;
+use crate::physics;
 use crate::resources;
+use crate::resources::input;
 use crate::utils;
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
@@ -17,9 +18,7 @@ const BIG_RAD: f32 = 100.0;
 const SMALL_DENSITY: f32 = 0.0001;
 const SMALL_RAD: f32 = 10.0;
 
-pub fn spawn_initial(
-    mut commands: Commands,
-) {
+pub fn spawn_initial(mut commands: Commands) {
     let mut big = Particle::default();
     handle_error(big.set_radius(BIG_RAD));
     handle_error(big.set_density(BIG_DENSITY));
@@ -47,7 +46,7 @@ pub struct SpawnIndicator;
 pub fn spawn_input(
     mut commands: Commands,
     mut mouse_state: ResMut<input::MouseState>,
-    spawn_indicators: Query<Entity, With<SpawnIndicator>>
+    spawn_indicators: Query<Entity, With<SpawnIndicator>>,
 ) {
     if let Some(released) = mouse_state.release {
         if let Some(clicked) = mouse_state.click {
@@ -57,7 +56,7 @@ pub fn spawn_input(
             p.set_pos(clicked);
             let vel = clicked - released;
             p.set_vel(vel);
-            commands.spawn(p.bundle(Color::WHITE, None));   
+            commands.spawn(p.bundle(Color::WHITE, None));
             *mouse_state = input::MouseState::default();
         }
     }
@@ -71,7 +70,7 @@ pub fn spawn_input(
             if let Some(clicked) = mouse_state.click {
                 commands.spawn((
                     utils::LineBundle::new(clicked, drag, Color::WHITE, 1.0),
-                    SpawnIndicator
+                    SpawnIndicator,
                 ));
             }
         }
@@ -89,10 +88,13 @@ pub fn update(
             if entity_a == *entity_b {
                 continue;
             }
-            a.handle_collision(b, state.numeric_constants.restitution.value);
-            a.handle_attraction(b, state.numeric_constants.g.value);
+            if physics::is_intersecting(&a, b) {
+                physics::resolve_intersection(&mut a, b);
+                physics::resolve_collision(&mut a, b, state.numeric_constants.restitution.value);
+            }
+            physics::attract(&mut a, b, state.numeric_constants.g.value);
         }
-        a.update(time.delta_seconds());
+        physics::update_particle(&mut a, time.delta_seconds());
     }
 }
 
@@ -100,7 +102,6 @@ pub fn render(
     mut query: Query<(&mut Transform, &Particle, &mut Fill, &mut Stroke)>,
     state: Res<resources::SimulationState>,
 ) {
-
     for (mut transform, particle, mut fill, mut stroke) in query.iter_mut() {
         let pos = particle.position();
         transform.translation = pos.extend(0.0);

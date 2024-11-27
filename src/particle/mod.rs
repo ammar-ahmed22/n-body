@@ -111,11 +111,7 @@ impl Particle {
     /// - color `Color`: The color to render the particle as
     /// - meshes `&mut ResMut<Assets<Mesh>>`: Mesh resource
     /// - materials: `&mut ResMut<Assets<ColorMaterial>>: Materials resource
-    pub fn bundle(
-        &self,
-        color: Color,
-        stroke: Option<Stroke>
-    ) -> ParticleBundle {
+    pub fn bundle(&self, color: Color, stroke: Option<Stroke>) -> ParticleBundle {
         return ParticleBundle::new(self.clone(), color, stroke);
     }
 
@@ -124,13 +120,6 @@ impl Particle {
         if self.points.len() > self.max_points {
             self.points.remove(0);
         }
-    }
-
-    /// Updates the particles position using Semi-implicit Euler integration
-    pub fn update(&mut self, dt: f32) {
-        self.vel += self.acc * dt;
-        self.pos += self.vel * dt;
-        self.acc = Vec2::ZERO;
     }
 
     /// Gets the position
@@ -158,49 +147,5 @@ impl Particle {
     /// i.e. If F = m a, therefore, a = F / m
     pub fn add_force(&mut self, f: Vec2) {
         self.acc += f / self.mass();
-    }
-
-    fn handle_intersection(&mut self, other: &Self, dist: f32, combined_radii: f32) {
-        let overlap = 0.5 * (combined_radii - dist);
-        let n = (self.pos - other.pos) / dist;
-        self.pos += n * overlap;
-    }
-
-    fn handle_elastic_response(&mut self, other: &Self, dist: f32, restitution: f32) {
-        if restitution < 0.0 || restitution > 1.0 {
-            warn!("Particle collision restitution is outside of the range [0.0, 1.0]! May cause unexpected results!");
-        }
-        let normal = (self.pos - other.pos) / dist;
-        let rel_vel = self.vel - other.vel;
-        let col_normal = rel_vel.dot(normal);
-        if col_normal <= 0.0 {
-            let self_inv_mass = 1.0 / self.mass();
-            let other_inv_mass = 1.0 / other.mass();
-            let impulse_mag =
-                (-(1.0 + restitution) * col_normal) / (self_inv_mass + other_inv_mass);
-            let impulse = normal * impulse_mag;
-            self.vel += impulse * self_inv_mass;
-        }
-    }
-
-    pub fn handle_collision(&mut self, other: &Self, restitution: f32) {
-        let dist = other.pos - self.pos;
-        let combined_radii = self.radius + other.radius;
-        let d = dist.length();
-        if d < combined_radii {
-            // Position updates
-            self.handle_intersection(other, d, combined_radii);
-
-            // Velocity updates
-            self.handle_elastic_response(other, d, restitution);
-        }
-    }
-
-    pub fn handle_attraction(&mut self, other: &Self, g: f32) {
-        let dist = other.pos - self.pos;
-        let d = dist.length();
-        let mag = (g * self.mass() * other.mass()) / (d.powf(2.0));
-        let f = dist.normalize() * mag;
-        self.add_force(f);
     }
 }
