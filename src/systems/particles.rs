@@ -28,7 +28,12 @@ pub fn spawn_initial(mut commands: Commands, state: Res<resources::SimulationSta
         p.set_radius(SMALL_RAD).unwrap();
         p.set_density(SMALL_DENSITY).unwrap();
         let pos = Vec2::new(ORBIT_SPACING * (i as f32) * side, 0.0);
-        let vel = physics::orbital_velocity(pos, big.position(), big.mass(), state.numeric_constants.g.value);
+        let vel = physics::orbital_velocity(
+            pos,
+            big.position(),
+            big.mass(),
+            state.numeric_constants.g.value,
+        );
         p.set_pos(pos);
         p.set_vel(vel);
         if side == 1.0 {
@@ -96,7 +101,11 @@ pub fn update(
                 }
                 if physics::is_intersecting(&a, b) {
                     physics::resolve_intersection(&mut a, b);
-                    physics::resolve_collision(&mut a, b, state.numeric_constants.restitution.value);
+                    physics::resolve_collision(
+                        &mut a,
+                        b,
+                        state.numeric_constants.restitution.value,
+                    );
                 }
                 physics::attract(&mut a, b, state.numeric_constants.g.value);
             }
@@ -105,9 +114,7 @@ pub fn update(
     }
 }
 
-pub fn render(
-    mut query: Query<(&mut Transform, &Particle, &mut Fill)>,
-) {
+pub fn render(mut query: Query<(&mut Transform, &Particle, &mut Fill)>) {
     let mut min_mass = f32::MAX;
     let mut max_mass = f32::MIN;
     for (_, particle, _) in query.iter() {
@@ -119,6 +126,10 @@ pub fn render(
         transform.translation = pos.extend(0.0);
         // Set the fill color according to mass (most massive is black, least massive is white)
         let normalized_mass = utils::math::normalize(particle.mass(), min_mass, max_mass, 0.0, 1.0);
-        *fill = Fill::color(Color::rgb(1.0 - normalized_mass, 1.0 - normalized_mass, 1.0 - normalized_mass));
+        *fill = Fill::color(Color::rgb(
+            1.0 - normalized_mass,
+            1.0 - normalized_mass,
+            1.0 - normalized_mass,
+        ));
     }
 }

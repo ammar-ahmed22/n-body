@@ -1,4 +1,3 @@
-
 /// Normalize a value from one range to another
 ///
 /// ### Arguments
@@ -14,4 +13,3 @@ pub fn normalize(value: f32, min: f32, max: f32, map_min: f32, map_max: f32) -> 
     let normalized = (value - min) / (max - min);
     map_min + normalized * (map_max - map_min)
 }
-

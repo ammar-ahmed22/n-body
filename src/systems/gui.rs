@@ -50,7 +50,6 @@ fn params_section(ui: &mut egui::Ui, numeric_constants: &mut constants::NumericC
         });
 }
 
-
 fn controls_section(ui: &mut egui::Ui, controls: &mut resources::controls::Controls) {
     egui::Grid::new("control_grid")
         .num_columns(2)
@@ -83,4 +82,3 @@ pub fn gui(
             controls_section(ui, &mut state.controls);
         });
 }
-
