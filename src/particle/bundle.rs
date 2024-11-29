@@ -3,6 +3,7 @@ use crate::particle::Particle;
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 
+/// Bundles Particle physics and rendering
 #[derive(Bundle)]
 pub struct ParticleBundle {
     shape_bundle: ShapeBundle,
@@ -13,6 +14,7 @@ pub struct ParticleBundle {
 }
 
 impl ParticleBundle {
+    /// Create a new ParticleBundle
     pub fn new(particle: Particle, color: Color, stroke: Option<Stroke>) -> Self {
         ParticleBundle {
             shape_bundle: ShapeBundle {
@@ -28,7 +30,7 @@ impl ParticleBundle {
             stroke: if let Some(stroke) = stroke {
                 stroke
             } else {
-                Stroke::new(Color::WHITE, 1.0)
+                Stroke::new(Color::rgba(0., 0., 0., 0.), 1.0)
             },
         }
     }
@@ -38,7 +40,7 @@ impl Default for ParticleBundle {
     fn default() -> Self {
         Self {
             fill: Fill::color(Color::WHITE),
-            stroke: Stroke::new(Color::WHITE, 1.0),
+            stroke: Stroke::new(Color::rgba(0., 0., 0., 0.), 1.0),
             ..default()
         }
     }

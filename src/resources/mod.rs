@@ -9,6 +9,12 @@ pub struct SimulationState {
     pub controls: controls::Controls,
 }
 
+impl Default for SimulationState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimulationState {
     pub fn new() -> Self {
         Self {

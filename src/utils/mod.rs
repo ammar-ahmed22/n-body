@@ -1,3 +1,4 @@
+pub mod math;
 use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 

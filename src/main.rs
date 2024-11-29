@@ -6,7 +6,7 @@ use n_body::resources;
 use n_body::resources::input;
 use n_body::systems;
 
-fn main() {
+fn main() {   
     App::new()
         .insert_resource(resources::SimulationState::new())
         .insert_resource(input::MouseState::default())

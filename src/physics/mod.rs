@@ -94,14 +94,37 @@ pub fn resolve_collision(a: &mut Particle, b: &Particle, r: f32) {
 /// - `a` The particle that will be attracted (force added)
 /// - `b` The particle that is atracting
 pub fn attract(a: &mut Particle, b: &Particle, g: f32) {
-    // let dist = other.pos - self.pos;
-    // let d = dist.length();
-    // let mag = (g * self.mass() * other.mass()) / (d.powf(2.0));
-    // let f = dist.normalize() * mag;
-    // self.add_force(f);
     let d = b.position() - a.position();
     let dist = d.length();
     let mag = (g * a.mass() * b.mass()) / (dist.powf(2.0));
     let f = d.normalize() * mag;
     a.add_force(f);
+}
+
+
+pub fn generate_particle_grid(center: Vec2, n: usize, radius: f32, density: f32) -> Vec<Particle> {
+  let mut particles: Vec<Particle> = Vec::new();
+  let n_f = n as f32;
+  let total_size = (n_f * 2.0 * radius) + 2.0 * radius;
+  let start = Vec2::new(center.x - (total_size / 2.0) + radius, center.x - (total_size / 2.0) + radius);
+  for i in 0..n {
+    for j in 0..n {
+      let x = start.x + 2.0 * radius * (j as f32);
+      let y = start.y + 2.0 * radius * (i as f32);
+      let mut p = Particle::default();
+      p.set_radius(radius).unwrap();
+      p.set_density(density).unwrap();
+      p.set_pos(Vec2::new(x, y));
+      particles.push(p);
+    }
+  }
+
+  return particles;
+}
+
+pub fn orbital_velocity(satellite: Vec2, planet: Vec2, planet_mass: f32, g: f32) -> Vec2 {
+  let r = satellite - planet;
+  let mag = ((g * planet_mass) / r.length()).sqrt();
+  let t = Vec2::new(-r.y, r.x).normalize();
+  return t * mag;
 }
