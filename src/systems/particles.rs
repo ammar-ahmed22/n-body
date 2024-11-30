@@ -8,26 +8,26 @@ use bevy::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 
 // Sizes
-const BIG_DENSITY: f32 = 10000.0 / 125.0;
-const BIG_RAD: f32 = 5.0;
-
-const SMALL_DENSITY: f32 = 0.1 / 125.0;
-const SMALL_RAD: f32 = 5.0;
+const RAD: f32 = 5.0;
+const BIG_DENSITY: f32 = 1e4; // extremely dense (simulating a sun, large mass)
+const SMALL_DENSITY: f32 = 0.1; // smaller (simulating a planet, smaller mass (relatively))
+const MED_DENSITY: f32 = 1.0; // a larger planet
 
 const ORBIT_SPACING: f32 = 50.0;
-const NUM_ORBITS: usize = 5;
+const ORBIT_START: f32 = 150.0;
+const NUM_ORBITS: usize = 2;
 
 pub fn spawn_initial(mut commands: Commands, state: Res<resources::SimulationState>) {
     let mut big = Particle::default();
-    handle_error(big.set_radius(BIG_RAD));
+    handle_error(big.set_radius(RAD));
     handle_error(big.set_density(BIG_DENSITY));
 
     let mut side: f32 = 1.0;
     for i in 1..NUM_ORBITS + 1 {
         let mut p = Particle::default();
-        p.set_radius(SMALL_RAD).unwrap();
-        p.set_density(SMALL_DENSITY).unwrap();
-        let pos = Vec2::new(ORBIT_SPACING * (i as f32) * side, 0.0);
+        p.set_radius(RAD).unwrap();
+        p.set_density(MED_DENSITY).unwrap();
+        let pos = Vec2::new(ORBIT_START * side + ORBIT_SPACING * (i as f32) * side, 0.0);
         let vel = physics::orbital_velocity(
             pos,
             big.position(),
@@ -58,7 +58,7 @@ pub fn spawn_input(
     if let Some(released) = mouse_state.release {
         if let Some(clicked) = mouse_state.click {
             let mut p = Particle::default();
-            handle_error(p.set_radius(SMALL_RAD));
+            handle_error(p.set_radius(RAD));
             handle_error(p.set_density(SMALL_DENSITY));
             p.set_pos(clicked);
             let vel = clicked - released;
@@ -83,7 +83,7 @@ pub fn spawn_input(
         }
     }
 }
-
+const SUBSTEPS: usize = 1;
 pub fn update(
     mut query: Query<(Entity, &mut Particle)>,
     time: Res<Time>,
@@ -91,9 +91,8 @@ pub fn update(
 ) {
     let particles: Vec<(Entity, Particle)> = query.iter().map(|(e, p)| (e, p.clone())).collect();
     let dt = time.delta_seconds();
-    let substeps: usize = 8;
-    let sub_dt = dt / (substeps as f32);
-    for _ in 0..substeps {
+    let sub_dt = dt / (SUBSTEPS as f32);
+    for _ in 0..SUBSTEPS {
         for (entity_a, mut a) in query.iter_mut() {
             for (entity_b, b) in &particles {
                 if entity_a == *entity_b {
@@ -124,12 +123,13 @@ pub fn render(mut query: Query<(&mut Transform, &Particle, &mut Fill)>) {
     for (mut transform, particle, mut fill) in query.iter_mut() {
         let pos = particle.position();
         transform.translation = pos.extend(0.0);
+        
         // Set the fill color according to mass (most massive is black, least massive is white)
         let normalized_mass = utils::math::normalize(particle.mass(), min_mass, max_mass, 0.0, 1.0);
         *fill = Fill::color(Color::rgb(
-            1.0 - normalized_mass,
-            1.0 - normalized_mass,
-            1.0 - normalized_mass,
+                1.0 - normalized_mass,
+                1.0 - normalized_mass,
+                1.0 - normalized_mass,
         ));
     }
 }

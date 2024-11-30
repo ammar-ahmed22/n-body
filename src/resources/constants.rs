@@ -26,7 +26,7 @@ pub struct NumericConstants {
 impl NumericConstants {
     pub fn new() -> Self {
         return Self {
-            g: NumericConstant::new(66.7, 0.0..=100.0, 0.1, "Gravitational Force Constant"),
+            g: NumericConstant::new(6.7, 0.0..=100.0, 0.1, "Gravitational Force Constant"),
             restitution: NumericConstant::new(0.8, 0.0..=1.0, 0.01, "Elastic Restitution"),
         };
     }
